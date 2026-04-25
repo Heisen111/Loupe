@@ -14,9 +14,9 @@ OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 OPENROUTER_MODELS = [
-    "deepseek/deepseek-chat-v3-0324:free",
-    "meta-llama/llama-4-maverick:free",
     "google/gemini-2.0-flash-001",
+    "qwen/qwen3-coder:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
 ]
 
 GROQ_MODEL = "llama-3.3-70b-versatile"

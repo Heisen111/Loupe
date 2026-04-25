@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const MODELS = [
   { label: 'Gemini 2.0 Flash',  value: 'google/gemini-2.0-flash-001' },
-  { label: 'DeepSeek Coder',    value: 'deepseek/deepseek-chat-v3-0324:free' },
-  { label: 'Llama 4 Maverick',  value: 'meta-llama/llama-4-maverick:free' },
+  { label: 'Qwen3 Coder (Free)',         value: 'qwen/qwen3-coder:free' },
+  { label: 'Llama 3.3 70B (Free)',       value: 'meta-llama/llama-3.3-70b-instruct:free' }
 ]
 
 interface AuditInputProps {
