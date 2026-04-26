@@ -33,3 +33,4 @@ dist-ssr/
 # IDE
 .vscode/
 .idea/
+.env.production
