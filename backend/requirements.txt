@@ -35,7 +35,6 @@ pydantic==2.13.3
 pydantic_core==2.46.3
 python-dotenv==1.2.2
 pyunormalize==17.0.0
-pywin32==311
 regex==2026.4.4
 requests==2.33.1
 rlp==4.1.0
