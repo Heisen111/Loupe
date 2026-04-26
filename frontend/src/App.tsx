@@ -7,6 +7,7 @@ import AuditInput from './components/AuditInput'
 import LoadingState from './components/LoadingState'
 import AuditReport from './components/AuditReport'
 import HowItWorks from './components/HowItWorks'
+import SampleReports from './components/SampleReports'
 import Footer from './components/Footer'
 
 import { runAudit } from './lib/api'
@@ -101,6 +102,13 @@ export default function App() {
     }
   }
 
+  const handleLoadSample = (report: AuditReportType, input: string) => {
+    setError(null)
+    setIsLoading(false)
+    setLastInput(input)
+    setAuditResult(report)
+  }
+
   return (
     <div
       style={{
@@ -182,6 +190,9 @@ export default function App() {
       <section id="how-it-works">
         <HowItWorks />
       </section>
+
+       {/* Sample Reports */}
+      <SampleReports onLoadSample={handleLoadSample} />
 
       <Footer />
     </div>

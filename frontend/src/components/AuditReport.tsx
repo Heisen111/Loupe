@@ -4,6 +4,8 @@ import type { AuditReport as AuditReportType, Vulnerability } from '../types/aud
 import RiskScoreCard from './RiskScoreCard'
 import VulnerabilityCard from './VulnerabilityCard'
 import Phase2Findings from './Phase2Findings'
+import { exportAuditPDF } from '../lib/exportPdf'
+
 
 interface AuditReportProps {
   report: AuditReportType
@@ -68,7 +70,7 @@ export default function AuditReport({ report, contractInput }: AuditReportProps)
   const timestamp       = formatTimestamp()
 
   const handleExportPdf = () => {
-    console.log('[Loupe] Export PDF — stub, implement Day 5', report)
+    exportAuditPDF(report, contractName)
   }
 
   return (
