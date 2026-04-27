@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from services.etherscan import fetch_contract_source
 from services.auditor import run_audit
 from services.llm import OPENROUTER_MODELS
+from services.attestation import post_attestation
 
 load_dotenv()
 
@@ -86,6 +87,14 @@ async def audit(request: AuditRequest):
     except Exception as e:
         logger.error(f"[/audit] Unexpected error: {e}")
         return error(500, f"Unexpected error during audit: {str(e)}")
+
+    # Post attestation
+    try:
+        attestation = await post_attestation(result, inp)
+        result["attestation"] = attestation
+        logger.info(f"[/audit] Attestation recorded: {attestation.get('tx_hash')}")
+    except Exception as e:
+        logger.warning(f"[/audit] Attestation failed (non-fatal): {e}")
 
     return result
 

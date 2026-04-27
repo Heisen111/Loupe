@@ -35,6 +35,7 @@ export interface Attestation {
   tx_hash: string
   chain: string
   timestamp: string
+  explorer_url: string
 }
 
 export interface AuditReport {

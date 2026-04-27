@@ -4,6 +4,7 @@ import type { AuditReport as AuditReportType, Vulnerability } from '../types/aud
 import RiskScoreCard from './RiskScoreCard'
 import VulnerabilityCard from './VulnerabilityCard'
 import Phase2Findings from './Phase2Findings'
+import AttestationBadge from './AttestationBadge'
 import { exportAuditPDF } from '../lib/exportPdf'
 
 
@@ -173,6 +174,8 @@ export default function AuditReport({ report, contractInput }: AuditReportProps)
         contractAddress={contractAddress}
         metadata={report.audit_metadata}
       />
+
+      <AttestationBadge attestation={report.attestation} />
 
       <Divider />
 
