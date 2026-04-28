@@ -9,6 +9,7 @@ import AuditReport from './components/AuditReport'
 import HowItWorks from './components/HowItWorks'
 import SampleReports from './components/SampleReports'
 import Footer from './components/Footer'
+import { streamAudit } from './lib/api'
 
 import { runAudit } from './lib/api'
 import type { AuditReport as AuditReportType } from './types/audit'
@@ -73,6 +74,8 @@ export default function App() {
   const [auditResult, setAuditResult] = useState<AuditReportType | null>(null)
   const [error, setError]             = useState<string | null>(null)
   const [lastInput, setLastInput]     = useState('')
+  const [statusMessage, setStatusMessage] = useState<string>('')
+  const cleanupRef = useRef<(() => void) | null>(null)
 
   const reportRef = useRef<HTMLDivElement>(null)
 
@@ -85,21 +88,37 @@ export default function App() {
     }
   }, [auditResult])
 
+  useEffect(() => {
+    return () => { cleanupRef.current?.() }
+  }, [])
+
   const handleAudit = async (input: string, model: string) => {
+    // Cleanup any existing stream
+    cleanupRef.current?.()
+
     setIsLoading(true)
     setError(null)
     setAuditResult(null)
+    setStatusMessage('')
     setLastInput(input)
 
-    try {
-      const result = await runAudit(input, model)
-      setAuditResult(result)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Audit failed. Please try again.'
-      setError(message)
-    } finally {
-      setIsLoading(false)
-    }
+    const cleanup = streamAudit(
+      input,
+      model,
+      (msg) => setStatusMessage(msg),
+      (report) => {
+        setAuditResult(report)
+        setIsLoading(false)
+        setStatusMessage('')
+      },
+      (err) => {
+        setError(err)
+        setIsLoading(false)
+        setStatusMessage('')
+      },
+    )
+
+    cleanupRef.current = cleanup
   }
 
   const handleLoadSample = (report: AuditReportType, input: string) => {
@@ -144,7 +163,7 @@ export default function App() {
               transition={{ duration: 0.3 }}
               style={{ width: '100%', maxWidth: '580px' }}
             >
-              <LoadingState />
+              <LoadingState currentStatus={statusMessage} />
             </motion.div>
           )}
         </AnimatePresence>

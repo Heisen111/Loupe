@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -10,6 +11,7 @@ from services.etherscan import fetch_contract_source
 from services.auditor import run_audit
 from services.llm import OPENROUTER_MODELS
 from services.attestation import post_attestation
+from services.streaming import stream_audit as _stream_audit
 
 load_dotenv()
 
@@ -98,6 +100,26 @@ async def audit(request: AuditRequest):
 
     return result
 
+@app.get("/audit/stream", tags=["Audit"])
+async def audit_stream(input: str, model: str = OPENROUTER_MODELS[0]):
+    """
+    SSE stream endpoint for real-time audit updates.
+    Yields: status messages, then final result or error.
+    """
+    inp = input.strip()
+
+    if not inp:
+        return error(400, "Input is empty.")
+
+    return StreamingResponse(
+        _stream_audit(inp, model),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        },
+    )
 
 @app.get("/samples", tags=["Samples"])
 async def samples():

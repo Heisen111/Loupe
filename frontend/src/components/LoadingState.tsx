@@ -15,7 +15,11 @@ const MESSAGES = [
 
 const SKELETON_WIDTHS = ['90%', '70%', '80%', '55%']
 
-export default function LoadingState() {
+interface LoadingStateProps {
+  currentStatus?: string
+}
+
+export default function LoadingState({ currentStatus }: LoadingStateProps) {
   const [progress, setProgress] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
   const progressRef = useRef(0)
@@ -109,7 +113,7 @@ export default function LoadingState() {
         <div style={{ position: 'relative', height: '18px', flex: 1, overflow: 'hidden' }}>
           <AnimatePresence mode="wait">
             <motion.span
-              key={msgIndex}
+              key={currentStatus || String(msgIndex)}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -124,7 +128,7 @@ export default function LoadingState() {
                 whiteSpace: 'nowrap',
               }}
             >
-              {MESSAGES[msgIndex]}
+              {currentStatus || MESSAGES[msgIndex]}
             </motion.span>
           </AnimatePresence>
         </div>
