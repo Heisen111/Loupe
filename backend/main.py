@@ -12,6 +12,7 @@ from services.auditor import run_audit
 from services.llm import OPENROUTER_MODELS
 from services.attestation import post_attestation
 from services.streaming import stream_audit as _stream_audit
+from services.foundry_generator import generate_foundry_test
 
 load_dotenv()
 
@@ -120,6 +121,22 @@ async def audit_stream(input: str, model: str = OPENROUTER_MODELS[0]):
             "Connection": "keep-alive",
         },
     )
+
+class ExploitRequest(BaseModel):
+    vulnerability: dict
+    contract_source: str
+
+@app.post("/generate-exploit", tags=["Exploit"])
+async def generate_exploit(request: ExploitRequest):
+    try:
+        foundry_test = await generate_foundry_test(
+            request.vulnerability,
+            request.contract_source,
+        )
+        return {"foundry_test": foundry_test}
+    except Exception as e:
+        logger.error(f"[/generate-exploit] Failed: {e}")
+        return error(500, str(e))
 
 @app.get("/samples", tags=["Samples"])
 async def samples():

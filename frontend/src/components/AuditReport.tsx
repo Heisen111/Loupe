@@ -11,6 +11,7 @@ import { exportAuditPDF } from '../lib/exportPdf'
 interface AuditReportProps {
   report: AuditReportType
   contractInput: string
+  contractSource: string
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -64,7 +65,7 @@ function Divider() {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function AuditReport({ report, contractInput }: AuditReportProps) {
+export default function AuditReport({ report, contractInput, contractSource }: AuditReportProps) {
   const contractName    = deriveContractName(contractInput)
   const contractAddress = deriveContractAddress(contractInput)
   const sortedVulns     = sortVulns(report.vulnerabilities)
@@ -263,7 +264,7 @@ export default function AuditReport({ report, contractInput }: AuditReportProps)
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, ease: 'easeOut', delay: i * 0.05 }}
               >
-                <VulnerabilityCard vulnerability={vuln} index={i} />
+                <VulnerabilityCard vulnerability={vuln} index={i} contractSource={contractSource}/>
               </motion.div>
             ))}
           </div>

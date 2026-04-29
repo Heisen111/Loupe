@@ -76,7 +76,7 @@ export default function App() {
   const [lastInput, setLastInput]     = useState('')
   const [statusMessage, setStatusMessage] = useState<string>('')
   const cleanupRef = useRef<(() => void) | null>(null)
-
+  const [rawSource, setRawSource] = useState<string>('')
   const reportRef = useRef<HTMLDivElement>(null)
 
   // Scroll to report when result arrives
@@ -101,6 +101,7 @@ export default function App() {
     setAuditResult(null)
     setStatusMessage('')
     setLastInput(input)
+    setRawSource(input)
 
     const cleanup = streamAudit(
       input,
@@ -126,6 +127,7 @@ export default function App() {
     setIsLoading(false)
     setLastInput(input)
     setAuditResult(report)
+    setRawSource(input)
   }
 
   return (
@@ -198,6 +200,7 @@ export default function App() {
                 <AuditReport
                   report={auditResult}
                   contractInput={lastInput}
+                  contractSource={rawSource}
                 />
               </div>
             </motion.div>
