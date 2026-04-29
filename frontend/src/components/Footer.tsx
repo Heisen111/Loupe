@@ -128,7 +128,7 @@ export default function Footer() {
           <FooterLink href="#how-it-works" onClick={handleHowItWorks}>
             How it works
           </FooterLink>
-          <FooterLink href="#">
+          <FooterLink href="https://github.com/Heisen111/Loupe" onClick={(e) => { e.preventDefault(); window.open('https://github.com/Heisen111/Loupe', '_blank') }}>
             GitHub
           </FooterLink>
           <FooterLink href="#">

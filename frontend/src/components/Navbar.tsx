@@ -63,7 +63,9 @@ export default function Navbar() {
         </a>
 
         <a 
-          href="#"
+          href="https://github.com/Heisen111/Loupe"
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             color: 'rgba(240,235,225,0.45)',
             fontSize: '14px',
