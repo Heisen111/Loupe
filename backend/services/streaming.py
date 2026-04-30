@@ -1,5 +1,6 @@
 import json
 import logging
+import asyncio
 from typing import AsyncGenerator
 from services.auditor import run_audit
 from services.etherscan import fetch_contract_source
@@ -13,10 +14,6 @@ def _sse(payload: dict) -> str:
 
 
 async def stream_audit(source_or_address: str, model: str) -> AsyncGenerator[str, None]:
-    """
-    Async generator that yields SSE-formatted strings.
-    Handles address resolution, audit execution, and error reporting.
-    """
     try:
         # ── Resolve source ──────────────────────────────────────────────────────
         is_address = source_or_address.startswith("0x") and len(source_or_address) == 42
@@ -34,20 +31,29 @@ async def stream_audit(source_or_address: str, model: str) -> AsyncGenerator[str
         else:
             source = source_or_address
             yield _sse({"type": "status", "message": "Parsing Solidity source..."})
+            await asyncio.sleep(1.0)
 
-        # ── Phase 1 ─────────────────────────────────────────────────────────────
+        # ── Start LLM in background ─────────────────────────────────────────────
+        audit_task = asyncio.create_task(run_audit(source, model))
+
+        # ── Stream status messages while LLM runs in background ─────────────────
         yield _sse({"type": "status", "message": "Running Phase 1 vulnerability scan..."})
+        await asyncio.sleep(2.0)
+
         yield _sse({"type": "status", "message": "Checking reentrancy, access control, overflow..."})
+        await asyncio.sleep(2.5)
 
-        # ── Phase 2 ─────────────────────────────────────────────────────────────
         yield _sse({"type": "status", "message": "Running master hacker simulation..."})
-        yield _sse({"type": "status", "message": "Analyzing MEV risks and edge cases..."})
+        await asyncio.sleep(2.5)
 
-        # ── LLM call ────────────────────────────────────────────────────────────
+        yield _sse({"type": "status", "message": "Analyzing MEV risks and edge cases..."})
+        await asyncio.sleep(2.0)
+
         yield _sse({"type": "status", "message": "Generating audit report..."})
 
+        # ── Wait for LLM to finish ──────────────────────────────────────────────
         try:
-            result = await run_audit(source, model)
+            result = await audit_task
         except ValueError as e:
             yield _sse({"type": "error", "message": str(e)})
             return
@@ -70,7 +76,7 @@ async def stream_audit(source_or_address: str, model: str) -> AsyncGenerator[str
         except Exception as e:
             logger.warning(f"[Streaming] Attestation failed (non-fatal): {e}")
 
-        # ── Final result ─────────────────────────────────────────────────────────
+        # ── Final result ────────────────────────────────────────────────────────
         yield _sse({"type": "status", "message": "Audit complete."})
         yield _sse({"type": "result", "data": result})
 
