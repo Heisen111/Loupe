@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import loupeLogo from '../assets/loupe logo.png'
 
 export default function Navbar() {
   const handleHowItWorks = (e: React.MouseEvent) => {
@@ -26,17 +27,11 @@ export default function Navbar() {
     >
       {/* Left — Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle cx="10" cy="10" r="7" stroke="#C9973A" strokeWidth="1.5" />
-          <circle cx="10" cy="10" r="3" stroke="#C9973A" strokeWidth="1" strokeOpacity="0.6" />
-          <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="#C9973A" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
+        <img
+          src={loupeLogo}
+          alt="Loupe"
+          style={{ width: '24px', height: '24px', objectFit: 'contain' }}
+        />
         <span style={{ color: '#F0EBE1', fontSize: '15px', fontWeight: 500, letterSpacing: '0.01em' }}>
           Loupe
         </span>
