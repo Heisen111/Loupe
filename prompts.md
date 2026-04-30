@@ -77,3 +77,22 @@ and Basescan explorer URL. Wired into POST /audit endpoint as
 non-blocking (audit still returns if attestation fails). Built
 AttestationBadge.tsx frontend component with green on-chain badge
 and Basescan link.
+
+---
+
+## TASK 7 — SSE Streaming (TODO)
+Build backend/services/streaming.py with AsyncGenerator yielding
+SSE status updates and final result. Add GET /audit/stream endpoint.
+Update frontend api.ts with streamAudit() using EventSource.
+Update App.tsx handleAudit to use streaming. Update LoadingState
+to accept currentStatus prop from live stream.
+ 
+---
+ 
+## TASK 8 — Foundry Exploit Generator (TODO)
+Build backend/services/foundry_generator.py — takes vulnerability
+dict + contract source, calls LLM to generate complete Foundry test
+that executes the exploit. Add POST /generate-exploit endpoint.
+Add "Generate Foundry test" button in VulnerabilityCard for
+Critical/High vulns. Show generated Solidity in code block with
+copy-to-clipboard.
