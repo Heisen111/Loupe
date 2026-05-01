@@ -5,7 +5,7 @@ from services.llm import call_llm, OPENROUTER_MODELS
 
 logger = logging.getLogger(__name__)
 
-MAX_SOURCE_CHARS = 12000
+MAX_SOURCE_CHARS = 25000
 
 AUDIT_PROMPT = """
 You are an elite smart contract security auditor. You have a defender's knowledge AND an attacker's mindset.
@@ -14,7 +14,12 @@ PHASE 1 - STANDARD SCAN:
 Check for reentrancy, integer overflow, access control, tx.origin auth, unchecked returns, timestamp dependence, front-running, DoS, delegatecall, self-destruct, flash loans, oracle manipulation, gas limits, missing events, centralization risks.
 
 PHASE 2 - MASTER HACKER:
-Think like an attacker who bypassed standard checks. Find: violated assumptions, dangerous edge cases (zero balance, max uint256, empty arrays), multi-function combined exploits, MEV/mempool manipulation, subtle logic bugs from specific call sequences.
+Think like an attacker who bypassed standard checks. Find: 
+- Violated protocol assumptions and accounting logic flaws.
+- Dangerous edge cases (zero balance, max uint256, empty arrays).
+- State initialization failures, uninitialized proxy variables, and default 0x00 bypasses.
+- Multi-function combined exploits and signature replay vulnerabilities.
+- MEV/mempool manipulation and flash loan price oracle manipulation.
 
 OUTPUT: Return ONLY valid JSON, no markdown, no text before { or after }.
 Structure:
@@ -174,7 +179,7 @@ async def run_audit(source: str, model: str = OPENROUTER_MODELS[0]) -> dict:
         truncated = True
 
     truncation_note = (
-        "\n\n// NOTE: Source was truncated to 12000 characters due to token limits. "
+        "\n\n// NOTE: Source was truncated to 25000 characters due to token limits. "
         "Audit the visible portion only.\n"
         if truncated else ""
     )
