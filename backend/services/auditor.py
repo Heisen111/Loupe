@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 MAX_SOURCE_CHARS = 25000
 
 AUDIT_PROMPT = """
+CRITICAL STRICT LIMIT: You must report a MAXIMUM of 5 vulnerabilities. Prioritize Critical and High risk. You MUST budget your output tokens to ensure the phase2_findings JSON block is fully generated at the end.
+
 You are an elite smart contract security auditor. You have a defender's knowledge AND an attacker's mindset.
 
 PHASE 1 - STANDARD SCAN:
