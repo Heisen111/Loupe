@@ -42,7 +42,7 @@ Full audit report exportable as a styled PDF: summary, vulnerability breakdown, 
 - FastAPI + Python 3.11
 - httpx (async HTTP)
 - web3.py (Base Sepolia attestation)
-- OpenRouter API (Gemini 2.0 Flash, DeepSeek, Llama 4)
+- OpenRouter API (Gemini 2.0 Flash, Qwen3-coder, llama-3.3-70b)
 - Groq API (fallback)
 - Etherscan API V2 (contract source resolution)
 
