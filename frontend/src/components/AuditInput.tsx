@@ -10,9 +10,10 @@ const MODELS = [
 interface AuditInputProps {
   onAudit: (input: string, model: string) => void
   isLoading: boolean
+  auditsRemaining: number | null
 }
 
-export default function AuditInput({ onAudit, isLoading }: AuditInputProps) {
+export default function AuditInput({ onAudit, isLoading, auditsRemaining }: AuditInputProps) {
   const [input, setInput]   = useState('')
   const [model, setModel]   = useState(MODELS[0].value)
   const [error, setError]   = useState('')
@@ -195,6 +196,19 @@ export default function AuditInput({ onAudit, isLoading }: AuditInputProps) {
         >
           Ctrl+Enter to run
         </span>
+        {auditsRemaining !== null && (
+          <span
+            style={{
+              fontSize: '11px',
+              color: auditsRemaining <= 1
+                ? 'rgba(224,75,75,0.6)'
+                : 'rgba(240,235,225,0.18)',
+              marginLeft: 'auto',
+            }}
+          >
+            {auditsRemaining}/5 audits remaining today
+          </span>
+        )}
       </div>
     </div>
   )

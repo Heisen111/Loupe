@@ -78,6 +78,15 @@ export default function App() {
   const cleanupRef = useRef<(() => void) | null>(null)
   const [rawSource, setRawSource] = useState<string>('')
   const reportRef = useRef<HTMLDivElement>(null)
+  const [auditsRemaining, setAuditsRemaining] = useState<number | null>(null)
+
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/audit/remaining`)
+      .then(r => r.json())
+      .then(d => setAuditsRemaining(d.remaining))
+      .catch(() => {})
+  }, [])
 
   // Scroll to report when result arrives
   useEffect(() => {
@@ -99,6 +108,7 @@ export default function App() {
     setIsLoading(true)
     setError(null)
     setAuditResult(null)
+    setAuditsRemaining(prev => prev !== null ? Math.max(0, prev - 1) : null)
     setStatusMessage('')
     setLastInput(input)
     setRawSource(input)
@@ -152,7 +162,7 @@ export default function App() {
       >
         <Hero />
 
-        <AuditInput onAudit={handleAudit} isLoading={isLoading} />
+        <AuditInput onAudit={handleAudit} isLoading={isLoading} auditsRemaining={auditsRemaining} />
 
         {/* Loading state */}
         <AnimatePresence>

@@ -1,9 +1,11 @@
 import os
 import logging
+import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
+from fastapi import Request
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -13,6 +15,7 @@ from services.llm import OPENROUTER_MODELS
 from services.attestation import post_attestation
 from services.streaming import stream_audit as _stream_audit
 from services.foundry_generator import generate_foundry_test
+from services.rate_limiter import is_rate_limited, get_remaining, get_reset_time
 
 load_dotenv()
 
@@ -58,8 +61,16 @@ async def health():
 
 
 @app.post("/audit", tags=["Audit"])
-async def audit(request: AuditRequest):
-    inp = request.input.strip()
+async def audit(request: Request, body: AuditRequest):
+    # ── Rate limit ──────────────────────────────────────────────────────────
+    client_ip = request.client.host
+    if is_rate_limited(client_ip):
+        reset_in = get_reset_time(client_ip)
+        hours = reset_in // 3600
+        minutes = (reset_in % 3600) // 60
+        return error(429, f"Daily audit limit reached (5/day). Resets in {hours}h {minutes}m.")
+
+    inp = body.input.strip()
 
     if not inp:
         return error(400, "Input is empty. Provide a contract address or Solidity source code.")
@@ -81,7 +92,7 @@ async def audit(request: AuditRequest):
 
     # Run audit
     try:
-        result = await run_audit(source, request.model)
+        result = await run_audit(source, body.model)
     except ValueError as e:
         return error(422, str(e))
     except RuntimeError as e:
@@ -102,11 +113,21 @@ async def audit(request: AuditRequest):
     return result
 
 @app.get("/audit/stream", tags=["Audit"])
-async def audit_stream(input: str, model: str = OPENROUTER_MODELS[0]):
+async def audit_stream(request: Request, input: str, model: str = OPENROUTER_MODELS[0]):
     """
     SSE stream endpoint for real-time audit updates.
     Yields: status messages, then final result or error.
     """
+    # ── Rate limit ──────────────────────────────────────────────────────────
+    client_ip = request.client.host
+    if is_rate_limited(client_ip):
+        reset_in = get_reset_time(client_ip)
+        hours = reset_in // 3600
+        minutes = (reset_in % 3600) // 60
+        async def error_stream():
+            yield f"data: {json.dumps({'type': 'error', 'message': f'Daily audit limit reached (5/day). Resets in {hours}h {minutes}m.'})}\n\n"
+        return StreamingResponse(error_stream(), media_type="text/event-stream")
+
     inp = input.strip()
 
     if not inp:
@@ -122,16 +143,34 @@ async def audit_stream(input: str, model: str = OPENROUTER_MODELS[0]):
         },
     )
 
+
+@app.get("/audit/remaining", tags=["Audit"])
+async def audit_remaining(request: Request):
+    client_ip = request.client.host
+    return {
+        "remaining": get_remaining(client_ip),
+        "limit": 5,
+        "reset_in_seconds": get_reset_time(client_ip),
+    }
+
 class ExploitRequest(BaseModel):
     vulnerability: dict
     contract_source: str
 
 @app.post("/generate-exploit", tags=["Exploit"])
-async def generate_exploit(request: ExploitRequest):
+async def generate_exploit(request: Request, body: ExploitRequest):
+    # ── Rate limit ──────────────────────────────────────────────────────────
+    client_ip = request.client.host
+    if is_rate_limited(client_ip):
+        reset_in = get_reset_time(client_ip)
+        hours = reset_in // 3600
+        minutes = (reset_in % 3600) // 60
+        return error(429, f"Daily audit limit reached (5/day). Resets in {hours}h {minutes}m.")
+
     try:
         foundry_test = await generate_foundry_test(
-            request.vulnerability,
-            request.contract_source,
+            body.vulnerability,
+            body.contract_source,
         )
         return {"foundry_test": foundry_test}
     except Exception as e:
