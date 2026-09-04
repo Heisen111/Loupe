@@ -19,7 +19,7 @@ OPENROUTER_MODELS = [
     "meta-llama/llama-3.3-70b-instruct:free",
 ]
 
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 
 TIMEOUT = 60.0
 MAX_TOKENS = 2000
